@@ -748,24 +748,31 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 
 var music = document.getElementById('bgmusic');
 var abtn = document.getElementById('audiobtn');
-music.volume = 0.3;
 var playing = false;
-function startMusic() {
-  if (!playing) {
-    music.play().then(function() {
+var tried = false;
+
+function playMusic() {
+  music.volume = 0.3;
+  var p = music.play();
+  if (p !== undefined) {
+    p.then(function() {
       playing = true;
       abtn.innerHTML = '&#9835; ON';
       abtn.style.borderColor = 'var(--emerald)';
       abtn.style.color = 'var(--emerald)';
-    }).catch(function(){});
+    }).catch(function(e) {
+      console.log('Autoplay blocked:', e);
+      playing = false;
+    });
   }
-  document.removeEventListener('click', startMusic);
-  document.removeEventListener('touchstart', startMusic);
-  document.removeEventListener('scroll', startMusic);
 }
-document.addEventListener('click', startMusic);
-document.addEventListener('touchstart', startMusic);
-document.addEventListener('scroll', startMusic);
+
+function tryAutoplay() {
+  if (tried) return;
+  tried = true;
+  playMusic();
+}
+
 function toggleMusic() {
   if (playing) {
     music.pause();
@@ -774,18 +781,28 @@ function toggleMusic() {
     abtn.style.color = 'var(--fuxia)';
     playing = false;
   } else {
-    music.volume = 0.3;
-    music.play();
-    abtn.innerHTML = '&#9835; ON';
-    abtn.style.borderColor = 'var(--emerald)';
-    abtn.style.color = 'var(--emerald)';
-    playing = true;
+    playMusic();
   }
 }
-abtn.addEventListener('click', function(e) { e.stopPropagation(); toggleMusic(); });
+
+abtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleMusic();
+});
+
+['click','touchstart','scroll','keydown'].forEach(function(evt) {
+  document.addEventListener(evt, function handler() {
+    tryAutoplay();
+    document.removeEventListener(evt, handler);
+  }, {once: true});
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  playMusic();
+});
 </script>
 
-<audio id="bgmusic" loop preload="auto">
+<audio id="bgmusic" loop preload="auto" crossorigin="anonymous">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 </body>
