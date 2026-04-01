@@ -512,6 +512,53 @@ footer .footer-copy { font-size: 0.8rem; color: rgba(192,192,192,0.35); letter-s
   .social-links a svg { width: 22px; height: 22px; }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js">
+var sound = new Howl({
+  src: ['music.mp3'],
+  loop: true,
+  volume: 0.3,
+  html5: true
+});
+var playing = false;
+var abtn = document.getElementById('audiobtn');
+
+function startAll() {
+  document.getElementById('loader').classList.add('hidden');
+  if (!playing) {
+    sound.play();
+    playing = true;
+    abtn.innerHTML = '&#9835; ON';
+    abtn.style.borderColor = 'var(--emerald)';
+    abtn.style.color = 'var(--emerald)';
+  }
+}
+
+// Click sul loader avvia musica + chiude loader
+document.getElementById('loader').addEventListener('click', startAll);
+document.getElementById('loader').addEventListener('touchstart', startAll);
+
+function toggleMusic() {
+  if (playing) {
+    sound.pause();
+    abtn.innerHTML = '&#9835; OFF';
+    abtn.style.borderColor = 'rgba(255,45,138,0.4)';
+    abtn.style.color = 'var(--fuxia)';
+    playing = false;
+  } else {
+    sound.play();
+    abtn.innerHTML = '&#9835; ON';
+    abtn.style.borderColor = 'var(--emerald)';
+    abtn.style.color = 'var(--emerald)';
+    playing = true;
+  }
+}
+
+abtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleMusic();
+});
+
+</script>
 </head>
 <body>
 
@@ -519,6 +566,7 @@ footer .footer-copy { font-size: 0.8rem; color: rgba(192,192,192,0.35); letter-s
 <div class="loader" id="loader">
   <div class="loader-name">Sonia Farinelli</div>
   <div class="loader-line"></div>
+<p style="margin-top:2rem;font-size:0.75rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--mist);cursor:pointer;animation:breathe 2s ease-in-out infinite">Tocca per entrare</p>
 </div>
 
 <!-- NAVBAR -->
@@ -716,9 +764,7 @@ footer .footer-copy { font-size: 0.8rem; color: rgba(192,192,192,0.35); letter-s
 </footer>
 
 <script>
-window.addEventListener('load', function() {
-  setTimeout(function() { document.getElementById('loader').classList.add('hidden'); }, 1800);
-});
+// loader gestito dal click
 var navbar = document.getElementById('navbar');
 window.addEventListener('scroll', function() { navbar.classList.toggle('scrolled', window.scrollY > 80); });
 var burger = document.getElementById('burger');
@@ -746,42 +792,49 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
   });
 });
 
-var music = document.getElementById('bgmusic');
-var abtn = document.getElementById('audiobtn');
-var playing = false;
-var tried = false;
 
-function playMusic() {
-  music.volume = 0.3;
-  var p = music.play();
-  if (p !== undefined) {
-    p.then(function() {
-      playing = true;
-      abtn.innerHTML = '&#9835; ON';
-      abtn.style.borderColor = 'var(--emerald)';
-      abtn.style.color = 'var(--emerald)';
-    }).catch(function(e) {
-      console.log('Autoplay blocked:', e);
-      playing = false;
-    });
+
+document.addEventListener('DOMContentLoaded', function() {
+  playMusic();
+});
+
+var sound = new Howl({
+  src: ['music.mp3'],
+  loop: true,
+  volume: 0.3,
+  html5: true
+});
+var playing = false;
+var abtn = document.getElementById('audiobtn');
+
+function startAll() {
+  document.getElementById('loader').classList.add('hidden');
+  if (!playing) {
+    sound.play();
+    playing = true;
+    abtn.innerHTML = '&#9835; ON';
+    abtn.style.borderColor = 'var(--emerald)';
+    abtn.style.color = 'var(--emerald)';
   }
 }
 
-function tryAutoplay() {
-  if (tried) return;
-  tried = true;
-  playMusic();
-}
+// Click sul loader avvia musica + chiude loader
+document.getElementById('loader').addEventListener('click', startAll);
+document.getElementById('loader').addEventListener('touchstart', startAll);
 
 function toggleMusic() {
   if (playing) {
-    music.pause();
+    sound.pause();
     abtn.innerHTML = '&#9835; OFF';
     abtn.style.borderColor = 'rgba(255,45,138,0.4)';
     abtn.style.color = 'var(--fuxia)';
     playing = false;
   } else {
-    playMusic();
+    sound.play();
+    abtn.innerHTML = '&#9835; ON';
+    abtn.style.borderColor = 'var(--emerald)';
+    abtn.style.color = 'var(--emerald)';
+    playing = true;
   }
 }
 
@@ -790,20 +843,6 @@ abtn.addEventListener('click', function(e) {
   toggleMusic();
 });
 
-['click','touchstart','scroll','keydown'].forEach(function(evt) {
-  document.addEventListener(evt, function handler() {
-    tryAutoplay();
-    document.removeEventListener(evt, handler);
-  }, {once: true});
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-  playMusic();
-});
 </script>
-
-<audio id="bgmusic" loop preload="auto" crossorigin="anonymous">
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
 </body>
 </html>
