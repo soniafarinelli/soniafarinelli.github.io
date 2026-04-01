@@ -530,6 +530,7 @@ footer .footer-copy { font-size: 0.8rem; color: rgba(192,192,192,0.35); letter-s
     <li><a href="#galleria">Galleria</a></li>
     <li><a href="#contatti">Contatti</a></li>
   </ul>
+  <button class="audio-btn" id="audiobtn" aria-label="Attiva musica" style="background:none;border:1px solid var(--emerald);color:var(--emerald);font-family:var(--sans);font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;padding:0.5rem 1rem;cursor:pointer;transition:all 0.3s;margin-right:1rem;">&#9835; ON</button>
   <button class="burger" id="burger" aria-label="Menu di navigazione">
     <span></span><span></span><span></span>
   </button>
@@ -537,6 +538,7 @@ footer .footer-copy { font-size: 0.8rem; color: rgba(192,192,192,0.35); letter-s
 
 <!-- MOBILE MENU -->
 <div class="mob-menu" id="mobmenu">
+  <a href="#" onclick="toggleMusic();chiudi()" style="font-size:1.2rem;color:var(--fuxia)">&#9835; musica on/off</a>
   <a href="#about" onclick="chiudi()">chi sono</a>
   <a href="#servizi" onclick="chiudi()">servizi</a>
   <a href="#galleria" onclick="chiudi()">galleria</a>
@@ -743,6 +745,48 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   });
 });
+
+var music = document.getElementById('bgmusic');
+var abtn = document.getElementById('audiobtn');
+music.volume = 0.3;
+var playing = false;
+function startMusic() {
+  if (!playing) {
+    music.play().then(function() {
+      playing = true;
+      abtn.innerHTML = '&#9835; ON';
+      abtn.style.borderColor = 'var(--emerald)';
+      abtn.style.color = 'var(--emerald)';
+    }).catch(function(){});
+  }
+  document.removeEventListener('click', startMusic);
+  document.removeEventListener('touchstart', startMusic);
+  document.removeEventListener('scroll', startMusic);
+}
+document.addEventListener('click', startMusic);
+document.addEventListener('touchstart', startMusic);
+document.addEventListener('scroll', startMusic);
+function toggleMusic() {
+  if (playing) {
+    music.pause();
+    abtn.innerHTML = '&#9835; OFF';
+    abtn.style.borderColor = 'rgba(255,45,138,0.4)';
+    abtn.style.color = 'var(--fuxia)';
+    playing = false;
+  } else {
+    music.volume = 0.3;
+    music.play();
+    abtn.innerHTML = '&#9835; ON';
+    abtn.style.borderColor = 'var(--emerald)';
+    abtn.style.color = 'var(--emerald)';
+    playing = true;
+  }
+}
+abtn.addEventListener('click', function(e) { e.stopPropagation(); toggleMusic(); });
 </script>
+
+<audio id="bgmusic" loop preload="auto">
+  <source src="music.m4a" type="audio/mp4">
+</audio>
 </body>
 </html>
